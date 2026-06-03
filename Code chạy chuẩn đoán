@@ -1,0 +1,56 @@
+from tensorflow.keras.models import load_model
+from tensorflow.keras.utils import load_img
+
+import numpy as np
+import matplotlib.pyplot as plt
+import json
+
+model = load_model("flower_mobilenet.keras")
+
+with open("flower_classes.json","r") as f:
+    class_indices = json.load(f)
+
+class_labels = {
+    v:k
+    for k,v in class_indices.items()
+}
+
+image_path = "/content/download.jpg"
+
+img = load_img(
+    image_path,
+    target_size=(224,224)
+)
+
+plt.imshow(img)
+plt.axis("off")
+plt.show()
+
+img_array = np.array(img)
+
+img_array = img_array.astype("float32") / 255.0
+
+img_array = np.expand_dims(
+    img_array,
+    axis=0
+)
+
+prediction = model.predict(img_array)[0]
+a
+print("===== Probability =====")
+
+for i,p in enumerate(prediction):
+    print(
+        class_labels[i],
+        f"{p*100:.2f}%"
+    )
+
+predicted_class = np.argmax(prediction)
+
+flower_name = class_labels[predicted_class]
+
+confidence = prediction[predicted_class] * 100
+
+print("\nKết quả:")
+print("Loài hoa:", flower_name)
+print(f"Độ tin cậy: {confidence:.2f}%")
